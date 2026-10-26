@@ -26,6 +26,7 @@
 
   <div class="nav-links" id="navLinks">
     <a href="#about">About</a>
+    <a href="#engineering">Engineering</a>
     <a href="#work">Work</a>
     <a href="#process">Process</a>
     <a href="#contact">Contact</a>
@@ -94,9 +95,40 @@
   <div class="shell">
     <p class="label label-sage reveal"><span class="dash"></span>Background</p>
 
-    <div class="timeline-wrap">
-      <ol class="timeline" id="timeline" data-anim="draw"></ol>
+    <div class="tracks">
+      <div class="track reveal">
+        <p class="track-k">Career</p>
+        <ol class="timeline" id="timeline" data-anim="draw"></ol>
+      </div>
+      <div class="track track-alt reveal d1">
+        <p class="track-k">Alongside the masters, in Sydney</p>
+        <ol class="timeline" id="timeline2" data-anim="draw"></ol>
+      </div>
     </div>
+  </div>
+</section>
+
+<!-- ══════════ the five years before design ══════════ -->
+<section class="eng" id="engineering">
+  <div class="shell">
+    <p class="label label-rose reveal"><span class="dash"></span>Before design</p>
+    <h2 class="eng-h reveal">Five years testing what other people shipped.</h2>
+
+    <article class="eng-card reveal d1" id="engCard">
+      <p class="eng-meta" id="engMeta"></p>
+      <p class="eng-scope" id="engScope"></p>
+      <ul class="eng-points" id="engPoints"></ul>
+
+      <button class="eng-toggle" id="engToggle" type="button" aria-expanded="false" aria-controls="engPoints">
+        <span class="eng-toggle-t">What that looked like</span>
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+          <path d="M2 4l3.5 3.5L9 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <p class="eng-close" id="engClose"></p>
+      <div class="eng-stack" id="engStack"></div>
+    </article>
   </div>
 </section>
 

@@ -4,25 +4,73 @@
    site says. Add a project by copying one block in PROJECTS.
    ═══════════════════════════════════════════════════════════ */
 
+/* ── career ───────────────────────────────────────
+   Consecutive entries sharing a `run` are drawn as one bracketed
+   stretch, so the three Freshworks roles read as one promotion
+   path rather than three separate jobs. The employer prints once,
+   on the first of the run. Keep notes rare here — the Before
+   design card underneath carries the detail. */
 const TIMELINE = [
   { period: "2018 \u2013 2019", role: "Internship Trainee", place: "Infosys, India",
     note: "First look at how far shipping drifts from the spec." },
 
-  { period: "2019 \u2013 2024", role: "Software Engineer in Test \u2192 Senior", place: "Freshworks, India",
-    note: "Five years measuring the gap between intent and what shipped." },
+  { period: "2019 \u2013 2020", role: "Graduate Trainee", run: "Freshworks, India" },
+
+  { period: "2020 \u2013 2021", role: "Software Engineer in Test", run: "Freshworks, India" },
+
+  { period: "2021 \u2013 2024", role: "Senior Software Engineer in Test", run: "Freshworks, India" },
 
   { period: "2025 \u2013 present", role: "Master of Interaction Design", place: "University of Technology Sydney",
-    note: "Field interviews, probes, usability testing and I build the prototypes.", now: true },
-
-  { period: "2025 \u2013 2026", role: "Support Worker", place: "Mable, Sydney",
-    note: "Kept me close to the people products forget." },
-
-  { period: "2026", role: "Volunteer", place: "Bluebird Pantry, UTS",
-    note: "Volunteering and stock management, on campus." },
-
-  { period: "2026 \u2013 present", role: "Customer Service", place: "Anita Gelato, Sydney",
-    note: "Front of house, at pace.", now: true }
+    note: "Field interviews, probes, usability testing and I build the prototypes.", now: true }
 ];
+
+/* ── alongside the masters, in Sydney ──────────────────
+   A second, quieter track. No notes: these are here to show the
+   years are accounted for and that you have worked in Australia,
+   not to compete with the career line above. */
+const ALONGSIDE = [
+  { period: "2025 \u2013 2026", role: "Support Worker", place: "Mable, Sydney" },
+  { period: "2026",        role: "Pantry Volunteer", place: "Bluebird Pantry, UTS" },
+  { period: "2026 \u2013 present", role: "Customer Service", place: "Anita Gelato, Sydney", now: true }
+];
+
+/* ── the five years before design ───────────────────────
+   Its own section, sitting between Background and Selected work.
+   Keep it short: it is the evidence under the headline, not a
+   second CV. Four cards is the ceiling. */
+const ENGINEERING = {
+  meta:  "Software Engineer in Test \u2192 Senior  \u00b7  Freshworks, Chennai  \u00b7  Jul 2019 \u2013 Aug 2024",
+  lede:  "Before interaction design I spent five years at Freshworks testing what other teams shipped \u2014 leading a QA team, automating the suite that guarded it, and sitting in planning sessions while features were still arguments rather than code.",
+
+  stats: [
+    { big: "5 yrs",  small: "Engineer in test, then Senior" },
+    { big: "2\u00d7",     small: "Test coverage, at near-zero bug leakage" },
+    { big: "95%+",   small: "Nightly regression pass rate, held" }
+  ],
+
+  scope: ["Agent Management", "Routing", "Sandbox", "Background Jobs"],
+
+  cards: [
+    { name: "Led the QA team",
+      note: "Designed and ran the test plans, mentored the junior engineers, and acted as squad lead for grooming, staging and production releases." },
+    { name: "Automated it, then ran it nightly",
+      note: "Built the Ruby and Selenium suite that doubled coverage, and the Jenkins pipelines that ran it every night \u2014 so a regression surfaced the next morning rather than the next release." },
+    { name: "Removed the team's dependencies",
+      note: "Built a Wiremock-based stub product so testing no longer waited on the live environment, and kept dashboards on 4xx and 5xx rates across staging and production." },
+    { name: "In the room before the build",
+      note: "Took features at the planning stage and found the collisions between them \u2014 two features that would break each other \u2014 before either was written. Ran knowledge transfers and demos to onboard other teams onto our platform services." }
+  ],
+
+  /* concrete nouns only. "Strong problem solving" and "excellent
+     communication" were on the CV too, but a chip that every
+     candidate could claim adds nothing to a card like this. */
+  stack: [
+    { group: "Tools",   items: ["Ruby", "Python", "Selenium", "Jenkins", "Wiremock", "Jira", "Freshrelease"] },
+    { group: "Testing", items: ["Regression", "API", "Load", "Performance", "Sanity"] }
+  ],
+
+  close: "It is why I prototype in the language the thing will actually be built in, and why I am comfortable being the person who says it is not ready."
+};
 
 /* ⚠ REPLACE ALL THREE BEFORE PUBLISHING.
    Ask each person for two sentences: one on how you work,

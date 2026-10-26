@@ -14,18 +14,66 @@
   /* ── footer year ─────────────────────────────────────── */
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  /* ── timeline ────────────────────────────────────────── */
-  document.getElementById("timeline").innerHTML = TIMELINE.map(function (t) {
-    return (
-      '<li' + (t.now ? ' class="now"' : '') + '>' +
-        '<span class="dot"></span>' +
-        '<p class="period">' + t.period + '</p>' +
-        '<p class="role">' + t.role + '</p>' +
-        '<p class="place">' + t.place + '</p>' +
-        '<p class="note">' + t.note + '</p>' +
-      '</li>'
-    );
-  }).join("");
+  /* ── timelines ───────────────────────────────────────── */
+  /* Two tracks: the career line, and the quieter one for the work
+     done alongside the masters in Sydney. Both use the same markup
+     so the draw-on-scroll animation covers them without changes. */
+  function renderTrack(id, rows) {
+    var host = document.getElementById(id);
+    if (!host) return;
+
+    host.innerHTML = rows.map(function (t, i) {
+      /* a stretch at one employer: mark where it starts and ends so the
+         CSS can bracket it, and print the employer only once */
+      var prev = rows[i - 1], next = rows[i + 1];
+      var inRun = !!t.run;
+      var cls = [];
+      if (t.now) cls.push("now");
+      if (inRun) {
+        cls.push("run");
+        if (!prev || prev.run !== t.run) cls.push("run-start");
+        if (!next || next.run !== t.run) cls.push("run-end");
+      }
+      var place = inRun
+        ? (cls.indexOf("run-start") > -1 ? t.run : "")
+        : (t.place || "");
+
+      return (
+        '<li' + (cls.length ? ' class="' + cls.join(" ") + '"' : '') + '>' +
+          '<span class="dot"></span>' +
+          '<p class="period">' + t.period + '</p>' +
+          '<p class="role">' + t.role + '</p>' +
+          (place ? '<p class="place">' + place + '</p>' : '') +
+          (t.note ? '<p class="note">' + t.note + '</p>' : '') +
+        '</li>'
+      );
+    }).join("");
+
+    /* The spine should stop at the last dot. Its length depends on how
+       tall the entries happen to be, so measure it rather than guessing
+       with a percentage — otherwise a tail hangs below the final entry. */
+    /* measure the list items, not the dots: a dot is absolutely
+       positioned inside its li, so its offsetTop is the same 2px on
+       every row and the difference would always be zero */
+    var items = host.children;
+    if (items.length > 1) {
+      host.style.setProperty("--spine",
+        (items[items.length - 1].offsetTop - items[0].offsetTop) + "px");
+    }
+  }
+
+  renderTrack("timeline", TIMELINE);
+
+  /* If data.js has no ALONGSIDE array, drop the whole second column
+     rather than leaving a heading over an empty space. */
+  var alt = document.querySelector(".track-alt");
+  if (typeof ALONGSIDE !== "undefined" && ALONGSIDE.length) {
+    renderTrack("timeline2", ALONGSIDE);
+  } else if (alt) {
+    alt.remove();
+    var tracks = document.querySelector(".tracks");
+    if (tracks) tracks.style.gridTemplateColumns = "1fr";
+  }
 
   /* ── quotes ──────────────────────────────────────────── */
   /* The longest quote runs full width as a lead testimonial and the rest
@@ -66,6 +114,60 @@
   document.getElementById("methods").innerHTML = METHODS.map(function (m) {
     return '<div class="method"><b>' + m.name + '</b><span>' + m.note + '</span></div>';
   }).join("");
+
+  /* ── the five years before design ─────────────────────── */
+  (function renderEngineering() {
+    var E = typeof ENGINEERING !== "undefined" ? ENGINEERING : null;
+    var host = document.getElementById("engPoints");
+    /* the section is optional — if the data or the markup isn't there,
+       leave the page alone rather than throwing halfway through setup */
+    if (!E || !host) return;
+
+    document.getElementById("engMeta").textContent  = E.meta;
+    document.getElementById("engClose").textContent = E.close;
+
+    /* the chips sit in their own row so they can be an equal-column grid
+       that fills the panel, rather than inline boxes that stop early */
+    document.getElementById("engScope").innerHTML =
+      '<span class="eng-scope-k">Owned end to end</span>' +
+      '<span class="eng-scope-row">' +
+        E.scope.map(function (t) { return "<i>" + t + "</i>"; }).join("") +
+      '</span>';
+
+    /* Collapsed, the four headings are the whole story — twenty words a
+       recruiter can take in at a glance. The sentence under each one is
+       the slow read, and stays folded away until it's asked for.
+       ENGINEERING.lede and .stats are no longer drawn for the same
+       reason; both are still in data.js if you want them back. */
+    host.innerHTML = E.cards.map(function (c) {
+      return '<li><b>' + c.name + '</b>' +
+               '<span class="eng-detail">' + c.note + '</span>' +
+             '</li>';
+    }).join("");
+
+    var card = document.getElementById("engCard");
+    var btn  = document.getElementById("engToggle");
+    if (card && btn) {
+      btn.addEventListener("click", function () {
+        var open = card.classList.toggle("open");
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+        btn.querySelector(".eng-toggle-t").textContent =
+          open ? "Hide the detail" : "What that looked like";
+      });
+    }
+
+    var stack = document.getElementById("engStack");
+    if (stack && E.stack) {
+      stack.innerHTML = E.stack.map(function (row) {
+        return '<div class="eng-stack-row">' +
+                 '<span class="eng-stack-k">' + row.group + '</span>' +
+                 '<span class="eng-stack-items">' +
+                   row.items.map(function (t) { return "<i>" + t + "</i>"; }).join("") +
+                 '</span>' +
+               '</div>';
+      }).join("");
+    }
+  })();
 
   /* ── the wall ────────────────────────────────────────── */
   var plain = function (str) { return str.replace(/&amp;/g, "and"); };
@@ -374,7 +476,7 @@
     });
   }, { rootMargin: "-45% 0px -50% 0px" });
 
-  ["about", "work", "process", "contact"].forEach(function (id) {
+  ["about", "engineering", "work", "process", "contact"].forEach(function (id) {
     var el = document.getElementById(id);
     if (el) spy.observe(el);
   });

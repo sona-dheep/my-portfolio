@@ -86,6 +86,7 @@ a{ color: inherit; }
 /* per-band overrides so the accent always has contrast */
 .about .label{ color: var(--sage-ink); }
 .work .label{ color: var(--rose-pale); }
+.eng .label{ color: var(--rose-pale); }
 .process .label{ color: var(--forest); }
 
 /* ─── buttons ────────────────────────────────────────────── */
@@ -174,37 +175,61 @@ a{ color: inherit; }
 .blob-sage{ right: -6rem; top: -6rem; width: 26rem; height: 26rem; background: var(--sage); opacity: .12; }
 .blob-rose{ left: -5rem; bottom: -5rem; width: 18rem; height: 18rem; background: var(--rose); opacity: .10; }
 .about .shell{ position: relative; z-index: 1; }
-.timeline-wrap{
-  position: relative; overflow-x: auto;
-  /* top padding leaves room for the 5px halo on the "now" dots.
-     overflow-x:auto also clips vertically, so without this the ring gets cut off. */
-  padding: 8px 0 .5rem;
+/* ─── the two tracks ─────────────────────────────────────
+   Vertical, side by side. Horizontally they had to share one
+   rule each and every column ended at a different height, so
+   the block was mostly ragged empty space. Down the page each
+   entry takes exactly the room its text needs. */
+.tracks{
+  display: grid; grid-template-columns: 1.1fr 1fr;
+  gap: 2rem clamp(2rem, 5vw, 4.5rem);
 }
-.timeline-wrap::-webkit-scrollbar{ height: 6px; }
-.timeline-wrap::-webkit-scrollbar-thumb{ background: rgba(164,184,122,.35); border-radius: 6px; }
+.track-k{
+  font-size: .62rem; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--sage-ink);
+  margin: 0 0 1.4rem; padding-bottom: .8rem;
+  border-bottom: 1px solid rgba(164, 184, 122, .22);
+}
+.track-alt .track-k{ color: var(--rose-pale); border-bottom-color: rgba(240, 200, 204, .22); }
 
-.timeline{
-  list-style: none; margin: 0; padding: 0;
-  display: flex; position: relative; min-width: 860px;
-}
+.timeline{ list-style: none; margin: 0; padding: 0; position: relative; }
+/* the spine */
 .timeline::before{
-  content: ""; position: absolute; top: 7px; left: 7px; right: 7px;
-  height: 1px; background: rgba(164,184,122,.32);
+  content: ""; position: absolute; left: 6px; top: 8px;
+  /* --spine is measured in main.js: first dot centre to last dot centre */
+  height: var(--spine, calc(100% - 16px));
+  width: 1px; background: rgba(164, 184, 122, .3);
 }
-.timeline li{ flex: 1; padding-right: 2.25rem; position: relative; }
-.timeline li:last-child{ padding-right: 0; }
+.track-alt .timeline::before{ background: rgba(240, 200, 204, .26); }
+
+.timeline li{ position: relative; padding: 0 0 1.5rem 1.85rem; }
+.timeline li:last-child{ padding-bottom: 0; }
 .timeline .dot{
-  display: block; width: 15px; height: 15px; border-radius: 50%;
-  background: var(--sage); margin-bottom: 1.25rem; position: relative; z-index: 1;
+  position: absolute; left: 0; top: 2px; z-index: 2;
+  width: 13px; height: 13px; border-radius: 50%; background: var(--sage);
 }
-.timeline li.now .dot{ box-shadow: 0 0 0 5px rgba(164,184,122,.24); }
+.track-alt .timeline .dot{ background: var(--rose-pale); }
+.timeline li.now .dot{ box-shadow: 0 0 0 5px rgba(164, 184, 122, .24); }
+.track-alt .timeline li.now .dot{ box-shadow: 0 0 0 5px rgba(240, 200, 204, .20); }
+
+/* a stretch at one employer: a thicker length of spine brackets the
+   roles that belong together, so three promotions read as one run */
+.timeline li.run::after{
+  content: ""; position: absolute; left: 4px; width: 5px;
+  top: 0; bottom: 0; border-radius: 99px;
+  background: rgba(164, 184, 122, .34);
+}
+.timeline li.run-start::after{ top: 8px; }
+.timeline li.run-end::after{ bottom: auto; height: 9px; }
+
 .timeline .period{
-  font-size: .68rem; font-weight: 700; letter-spacing: .1em;
-  color: var(--sage-ink); text-transform: uppercase; margin: 0 0 .3rem;
+  font-size: .64rem; font-weight: 700; letter-spacing: .1em;
+  color: var(--sage-ink); text-transform: uppercase; margin: 0 0 .25rem;
 }
-.timeline .role{ font-size: .98rem; font-weight: 600; color: var(--cream); margin: 0 0 .2rem; line-height: 1.3; }
-.timeline .place{ font-size: .8rem; color: rgba(251,232,204,.78); margin: 0 0 .6rem; }
-.timeline .note{ font-size: .85rem; line-height: 1.65; color: rgba(251,232,204,.80); margin: 0; }
+.track-alt .timeline .period{ color: rgba(240, 200, 204, .85); }
+.timeline .role{ font-size: .95rem; font-weight: 600; color: var(--cream); margin: 0; line-height: 1.3; }
+.timeline .place{ font-size: .78rem; color: rgba(251, 232, 204, .72); margin: .15rem 0 0; }
+.timeline .note{ font-size: .82rem; line-height: 1.6; color: rgba(251, 232, 204, .78); margin: .5rem 0 0; }
 
 /* ─── work ───────────────────────────────────────────────── */
 .work{
@@ -504,6 +529,124 @@ a{ color: inherit; }
 .method b{ display: block; font-size: .87rem; font-weight: 600; color: var(--dark); margin-bottom: .2rem; line-height: 1.25; }
 .method span{ font-size: .74rem; color: var(--forest-mid); line-height: 1.45; }
 
+/* ─── before design: the five years in test ───────────────
+   Same dark band and floating light card as Selected work.
+   One typeface inside the card: the display face is for section
+   headlines only.
+
+   Collapsed by default. Four headings carry the story in twenty
+   words; the sentence under each one unfolds on request. A
+   recruiter gets the scan, an engineering manager gets the depth,
+   and neither has to wade through the other's version. */
+.eng{
+  background: var(--dark); color: var(--cream);
+  padding: 6rem 0 6.5rem;
+  border-top: 1px solid rgba(164, 184, 122, .22);
+}
+.eng-h{
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(1.9rem, 4.6vw, 3rem); line-height: 1.06;
+  letter-spacing: -.028em; color: var(--cream);
+  margin: 0 0 2.5rem; max-width: 22ch;
+}
+.eng-card{
+  margin: 0;
+  background: var(--card); color: var(--dark);
+  border-radius: 18px; padding: clamp(1.6rem, 4vw, 2.6rem);
+  box-shadow: 0 18px 34px -20px rgba(0, 0, 0, .55);
+}
+.eng-meta{
+  margin: 0 0 1.3rem; padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--hair);
+  font-size: .74rem; font-weight: 600; letter-spacing: .03em;
+  color: var(--rose-ink);
+}
+
+/* the services, full width and filled — the one highlighted claim */
+.eng-scope{
+  margin: 0; padding: 1rem 1.2rem 1.15rem;
+  background: var(--sage-pale); border-radius: 14px;
+}
+.eng-scope-k{
+  display: block; margin-bottom: .7rem;
+  font-size: .62rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--forest);
+}
+/* equal columns, so the four fill the panel edge to edge instead of
+   trailing off halfway across it */
+.eng-scope-row{
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem;
+}
+.eng-scope i{
+  display: block; font-style: normal; text-align: center;
+  margin: 0; padding: .55rem .7rem;
+  background: var(--white); border: 1px solid rgba(52, 78, 56, .14);
+  border-radius: 100px; box-shadow: 0 1px 2px rgba(28, 43, 30, .06);
+  font-size: .88rem; font-weight: 600; color: var(--forest);
+}
+
+/* two columns of short claims, so four lines take up two */
+.eng-points{
+  list-style: none; margin: 1.5rem 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: .75rem 2.2rem; align-items: start;
+}
+.eng-points li{ position: relative; padding-left: 1.15rem; }
+.eng-points li::before{
+  content: ""; position: absolute; left: 0; top: .52em;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--dot-on);
+}
+.eng-points b{
+  display: block; font-size: .88rem; font-weight: 600;
+  line-height: 1.35; color: var(--dark);
+}
+/* the slow read — folded away until the toggle asks for it. Guarded on
+   .js so the detail is simply present when scripting is off. */
+.eng-detail{ display: block; font-size: .8rem; line-height: 1.55; color: var(--forest-mid); margin-top: .3rem; }
+.js .eng-card .eng-detail{ display: none; }
+.js .eng-card.open .eng-detail{ display: block; }
+
+.eng-toggle{
+  display: inline-flex; align-items: center; gap: .45rem;
+  margin: 1.2rem 0 0; padding: .4rem .85rem .4rem .9rem;
+  background: none; border: 1px solid var(--hair2); border-radius: 100px;
+  font-family: var(--body); font-size: .73rem; font-weight: 600;
+  letter-spacing: .02em; color: var(--forest-mid);
+  cursor: pointer; transition: border-color .2s, color .2s;
+}
+.eng-toggle:hover{ border-color: var(--forest); color: var(--forest); }
+.eng-toggle svg{ flex: none; transition: transform .25s ease; }
+.eng-card.open .eng-toggle svg{ transform: rotate(180deg); }
+.js-off-hide{ display: none; }
+
+.eng-close{
+  margin: 1.6rem 0 0; padding: .1rem 0 .1rem 1.1rem;
+  border-left: 2px solid var(--rose);
+  font-size: .9rem; font-weight: 500; line-height: 1.6;
+  color: var(--forest);
+}
+
+/* the tools, along the bottom — outline chips so they read as
+   supporting detail next to the filled ones above */
+.eng-stack{
+  margin-top: 1.6rem; padding-top: 1.3rem;
+  border-top: 1px solid var(--hair);
+  display: grid; gap: .55rem;
+}
+.eng-stack-row{ display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem .5rem; }
+.eng-stack-k{
+  flex: none; width: 4.6rem;
+  font-size: .62rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--forest-mid);
+}
+.eng-stack-items{ display: flex; flex-wrap: wrap; gap: .35rem; }
+.eng-stack i{
+  display: inline-block; font-style: normal;
+  padding: .18rem .62rem;
+  border: 1px solid var(--hair2); border-radius: 100px;
+  font-size: .72rem; color: var(--forest-body);
+}
+
 /* ─── contact ────────────────────────────────────────────── */
 .contact{ background: var(--cream); padding: 7rem 0 8rem; text-align: center; }
 .contact-h{
@@ -649,10 +792,10 @@ a{ color: inherit; }
 /* The sage line sweeps left to right; each dot springs in as the line
    reaches it, with its text following a beat behind. */
 .js .timeline::before{
-  transform: scaleX(0); transform-origin: left center;
-  transition: transform 1.15s cubic-bezier(.3,.7,.3,1);
+  transform: scaleY(0); transform-origin: center top;
+  transition: transform 1.05s cubic-bezier(.3,.7,.3,1);
 }
-.js .timeline.in::before{ transform: scaleX(1); }
+.js .timeline.in::before{ transform: scaleY(1); }
 
 .js .timeline .dot{ transform: scale(0); transition: transform .5s cubic-bezier(.34,1.5,.5,1); }
 .js .timeline.in .dot{ transform: scale(1); }
@@ -680,6 +823,12 @@ a{ color: inherit; }
   .quotes{ grid-template-columns: 1fr; }
   .quote.lead{ grid-column: auto; }
   .methods{ grid-template-columns: repeat(2, 1fr); }
+  .tracks{ grid-template-columns: 1fr; gap: 2.5rem; }
+  .eng-points{ grid-template-columns: 1fr; gap: .7rem; }
+  .eng-stack-row{ flex-direction: column; align-items: flex-start; }
+  .eng-stack-k{ width: auto; }
+  .eng-scope-row{ grid-template-columns: repeat(2, 1fr); }
+  .eng-scope i{ font-size: .8rem; padding: .5rem .5rem; }
 }
 
 @media (max-width: 760px){
@@ -710,6 +859,7 @@ a{ color: inherit; }
   .tw-caret{ display: none; }
   .tw-replay{ display: none; }
   .tile-status::before, .pills .status::before{ animation: none; }
+  .eng-toggle svg{ transition: none; }
   .js [data-anim="stagger"] > *,
   .js [data-anim="stagger"].in > *{ opacity: 1; animation: none; }
   .js .timeline::before,
