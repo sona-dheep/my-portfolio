@@ -34,9 +34,10 @@
         if (!prev || prev.run !== t.run) cls.push("run-start");
         if (!next || next.run !== t.run) cls.push("run-end");
       }
-      var place = inRun
-        ? (cls.indexOf("run-start") > -1 ? t.run : "")
-        : (t.place || "");
+      /* the employer prints on every role in a run, not just the first —
+         a reader who lands on one row shouldn't have to look upward to
+         find out where it happened */
+      var place = inRun ? t.run : (t.place || "");
 
       return (
         '<li' + (cls.length ? ' class="' + cls.join(" ") + '"' : '') + '>' +
@@ -169,6 +170,11 @@
     }
   })();
 
+  /* one mark for recognition, used on the tile and inside the project */
+  var STAR = '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">' +
+             '<path d="M5 0l1.3 3.2L9.8 3.6 7.2 5.9 8 9.4 5 7.6 2 9.4l.8-3.5L.2 3.6l3.5-.4z"' +
+             ' fill="currentColor"/></svg>';
+
   /* ── the wall ────────────────────────────────────────── */
   var plain = function (str) { return str.replace(/&amp;/g, "and"); };
 
@@ -209,6 +215,7 @@
               ' style="background:' + p.coverBg + '">' +
           (imgs.length ? slides + dots : blankArt(p)) +
           (p.status ? '<span class="tile-status">' + p.status + '</span>' : '') +
+          (p.award ? '<span class="tile-award">' + STAR + p.award.label + '</span>' : '') +
         '</span>' +
         '<span class="tile-body">' +
           '<span class="name">' + p.title + '</span>' +
@@ -353,6 +360,11 @@
           '</div>' +
           '<h2 id="sheetTitle">' + p.title + '</h2>' +
           '<p class="sub">' + p.subtitle + '</p>' +
+          (p.award
+            ? '<p class="sheet-award">' + STAR +
+                '<b>' + p.award.label + '</b> ' + p.award.detail +
+              '</p>'
+            : '') +
         '</div>' +
         cta +
       '</div>' +

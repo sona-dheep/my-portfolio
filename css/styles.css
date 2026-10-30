@@ -696,6 +696,30 @@ a{ color: inherit; }
 .tw-caret.live.done{ animation: caretOut 1.6s ease forwards; }
 @keyframes caretOut{ 0%, 55%{ opacity: 1 } 100%{ opacity: 0 } }
 
+/* ─── recognition ────────────────────────────────────────
+   A filled seal, so it reads as an award rather than as the
+   white status pill used for work in progress. Top-right, so
+   it never sits on top of that badge if a project has both. */
+.tile-award{
+  position: absolute; top: .72rem; right: .72rem; z-index: 2;
+  display: inline-flex; align-items: center; gap: .36rem;
+  padding: .3rem .62rem .3rem .55rem;
+  background: var(--forest); color: var(--cream);
+  border-radius: 100px;
+  font-family: var(--body); font-size: .6rem; font-weight: 700;
+  letter-spacing: .09em; text-transform: uppercase;
+  box-shadow: 0 2px 10px -4px rgba(0, 0, 0, .6);
+}
+.tile-award svg{ flex: none; opacity: .9; }
+
+/* and the full citation inside the open project */
+.sheet-award{
+  display: flex; align-items: baseline; gap: .45rem; flex-wrap: wrap;
+  margin: .7rem 0 0; font-size: .8rem; color: var(--forest-mid);
+}
+.sheet-award svg{ flex: none; color: var(--rose-ink); transform: translateY(1px); }
+.sheet-award b{ color: var(--forest); font-weight: 700; margin-right: .1rem; }
+
 /* the sound offer — audio can't autoplay, so it's opt-in by design */
 .tw-replay{
   display: inline-flex; align-items: center; gap: .5rem;

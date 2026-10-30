@@ -269,6 +269,9 @@ const PROJECTS = [
   {
     title: "Qrew",
     subtitle: "A community app for LGBTQ+ people who find showing up the hard part",
+    /* an award draws a seal on the tile and a line inside the project */
+    award: { label: "Highly Commended",
+             detail: "Interaction Design Project \u00b7 UTS Tech Festival 2026" },
     pills: ["UX research", "Usability testing", "Lean UX", "Heuristic evaluation"],
     img: "assets/qrew-cover.jpg",
     images: ["assets/qrew-cover.jpg", "assets/qrew-1.jpg", "assets/qrew-2.jpg", "assets/qrew-3.jpg"],
