@@ -860,33 +860,25 @@ a{ color: inherit; }
 .js [data-anim="stagger"].in > *:nth-child(12){ animation-delay: .70s; }
 
 /* ─── the timeline draws itself ──────────────────────────── */
-/* The sage line sweeps left to right; each dot springs in as the line
-   reaches it, with its text following a beat behind. */
+/* Scroll-linked (see scrollLinked in main.js): --draw runs 0 to 1 as
+   the list passes up the screen, and each entry gets .in as the line
+   reaches it. The short transition only smooths between scroll frames. */
 .js .timeline::before{
-  transform: scaleY(0); transform-origin: center top;
-  transition: transform 1.05s cubic-bezier(.3,.7,.3,1);
+  transform: scaleY(var(--draw, 0)); transform-origin: center top;
+  transition: transform .18s linear;
 }
-.js .timeline.in::before{ transform: scaleY(1); }
 
 .js .timeline .dot{ transform: scale(0); transition: transform .5s cubic-bezier(.34,1.5,.5,1); }
-.js .timeline.in .dot{ transform: scale(1); }
+.js .timeline li.in .dot{ transform: scale(1); }
+
+.js .timeline li.run::after{ opacity: 0; transition: opacity .5s ease; }
+.js .timeline li.in.run::after{ opacity: 1; }
 
 .js .timeline li p{
   opacity: 0; transform: translateY(10px);
-  transition: opacity .5s ease, transform .5s cubic-bezier(.25,.8,.35,1);
+  transition: opacity .5s ease .1s, transform .5s cubic-bezier(.25,.8,.35,1) .1s;
 }
-.js .timeline.in li p{ opacity: 1; transform: none; }
-
-.js .timeline.in li:nth-child(1) .dot{ transition-delay: .12s; }
-.js .timeline.in li:nth-child(1) p{ transition-delay: .24s; }
-.js .timeline.in li:nth-child(2) .dot{ transition-delay: .32s; }
-.js .timeline.in li:nth-child(2) p{ transition-delay: .44s; }
-.js .timeline.in li:nth-child(3) .dot{ transition-delay: .52s; }
-.js .timeline.in li:nth-child(3) p{ transition-delay: .64s; }
-.js .timeline.in li:nth-child(4) .dot{ transition-delay: .72s; }
-.js .timeline.in li:nth-child(4) p{ transition-delay: .84s; }
-.js .timeline.in li:nth-child(5) .dot{ transition-delay: .92s; }
-.js .timeline.in li:nth-child(5) p{ transition-delay: 1.04s; }
+.js .timeline li.in p{ opacity: 1; transform: none; }
 
 /* ─── responsive ─────────────────────────────────────────── */
 @media (max-width: 940px){
@@ -938,6 +930,7 @@ a{ color: inherit; }
   .js .timeline::before,
   .js .timeline .dot,
   .js .timeline li p{ transform: none; opacity: 1; transition: none; }
+  .js .timeline li.run::after{ opacity: 1; transition: none; }
   .btn:hover{ transform: none; }
   .tile{ transition: none; }
   .tile-img img{ transition: none; }
@@ -989,4 +982,84 @@ a{ color: inherit; }
 
 @media (prefers-reduced-motion: reduce){
   .probe{ display: none; }
+}
+
+/* ═══ touch, feedback and motion that works without a hover ═══ */
+
+/* ─── scroll progress, along the bottom edge of the nav ───── */
+.nav-progress{
+  position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  background: var(--rose); transform: scaleX(0); transform-origin: left center;
+  pointer-events: none;
+}
+
+/* ─── pressed states ──────────────────────────────────────
+   A phone has no hover, so the press is the only feedback a tap
+   gets. Quick in, slower out. */
+.btn:active, .sheet-cta a:active, .eng-toggle:active, .tw-replay:active{ transform: scale(.96); }
+.tile:active{ transform: scale(.985); }
+.tabs button:active{ color: var(--forest); }
+.tile, .btn, .tabs button, .burger, .eng-toggle{ -webkit-tap-highlight-color: transparent; }
+
+/* ─── comfortable tap targets ─────────────────────────────── */
+.eng-toggle, .tw-replay{ min-height: 40px; }
+.foot-links a{ display: inline-block; padding: .6rem 0; }
+.foot-in{ align-items: center; }
+
+/* ─── the detail unfolds instead of snapping ──────────────── */
+.js .eng-card .eng-detail{
+  display: block; max-height: 0; opacity: 0; margin-top: 0;
+  overflow: hidden; visibility: hidden;
+  transition: max-height .4s cubic-bezier(.3,.7,.3,1), opacity .3s ease,
+              margin-top .4s ease, visibility 0s .4s;
+}
+.js .eng-card.open .eng-detail{
+  max-height: 16em; opacity: 1; margin-top: .3rem; visibility: visible;
+  transition-delay: 0s;
+}
+
+/* ─── a tab's panel settles in ────────────────────────────── */
+.panel:not([hidden]){ animation: panelIn .28s ease; }
+@keyframes panelIn{ from{ opacity: 0; transform: translateY(6px); } }
+
+/* swipe sideways for the next picture, scroll vertically as normal */
+.sheet-img{ touch-action: pan-y; }
+
+/* ─── burger becomes a cross ──────────────────────────────── */
+.burger{ padding: 11px; margin: -11px; }
+.burger line{
+  transform-box: fill-box; transform-origin: center;
+  transition: transform .25s cubic-bezier(.3,.7,.3,1), opacity .15s ease;
+}
+.burger[aria-expanded="true"] line:nth-child(1){ transform: translateY(5px) rotate(45deg); }
+.burger[aria-expanded="true"] line:nth-child(2){ opacity: 0; }
+.burger[aria-expanded="true"] line:nth-child(3){ transform: translateY(-5px) rotate(-45deg); }
+
+@media (max-width: 760px){
+  /* the menu drops in rather than appearing; visibility keeps the
+     closed links out of the tab order */
+  .nav-links{
+    display: flex; visibility: hidden; opacity: 0; transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity .22s ease, transform .25s cubic-bezier(.3,.7,.3,1), visibility 0s .25s;
+    box-shadow: 0 18px 28px -22px rgba(28,43,30,.45);
+  }
+  .nav-links.open{
+    visibility: visible; opacity: 1; transform: none; pointer-events: auto;
+    transition-delay: 0s;
+  }
+  .nav-links a:not(.nav-cta){ padding: .35rem 0; }
+
+  /* the open project rises from the bottom edge, like a sheet should */
+  .scrim{ padding: 12px 0 0; }
+  .sheet{ border-radius: 16px 16px 0 0; min-height: calc(100% - 0px); animation-name: sheetup; animation-duration: .38s; }
+  @keyframes sheetup{ from{ opacity: .6; transform: translateY(60px); } to{ opacity: 1; transform: none; } }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .btn:active, .tile:active, .sheet-cta a:active, .eng-toggle:active, .tw-replay:active{ transform: none; }
+  .js .eng-card .eng-detail{ transition: none; }
+  .panel:not([hidden]){ animation: none; }
+  .burger line, .nav-links{ transition: none; }
+  .js .timeline::before{ transform: none; }
 }

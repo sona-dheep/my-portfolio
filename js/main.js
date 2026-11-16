@@ -297,6 +297,7 @@
       show(0);                       /* always rest on the title card */
     }
 
+    tile._start = start; tile._stop = stop;
     tile.addEventListener("mouseenter", start);
     tile.addEventListener("mouseleave", stop);
     /* Only start on *keyboard* focus. Closing the sheet returns focus to the
@@ -429,6 +430,19 @@
         var b = e.target.closest("button");
         if (b) goTo(+b.dataset.n);
       });
+
+      /* on a phone the arrows are small and the picture is the obvious
+         thing to grab, so a sideways swipe turns the page too. Vertical
+         movement is left alone so the sheet still scrolls. */
+      var frame = sheet.querySelector(".sheet-img"), sx = 0, sy = 0;
+      frame.addEventListener("touchstart", function (e) {
+        sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+      }, { passive: true });
+      frame.addEventListener("touchend", function (e) {
+        var dx = e.changedTouches[0].clientX - sx,
+            dy = e.changedTouches[0].clientY - sy;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) goTo(sAt + (dx < 0 ? 1 : -1));
+      }, { passive: true });
     }
 
     lastFocus = document.activeElement;
@@ -443,15 +457,36 @@
     var close = document.getElementById("closeBtn");
     close.focus();
     close.addEventListener("click", closeSheet);
+
+    /* On a phone the back gesture is how people dismiss things. Without
+       a history entry it would leave the site with a project open. */
+    try { history.pushState({ sheet: true }, ""); } catch (e) { /* file:// in some browsers */ }
   }
 
-  function closeSheet() {
+  function closeSheet(fromBack) {
+    if (!scrim.classList.contains("open")) return;
     scrim.classList.remove("open");
     scrim.hidden = true;
     document.body.style.overflow = "";
     sheet.innerHTML = "";
     if (lastFocus) lastFocus.focus();
+    /* closed by the button, scrim or Escape: take our entry back off */
+    if (fromBack !== true && history.state && history.state.sheet) history.back();
   }
+
+  window.addEventListener("popstate", function () { closeSheet(true); });
+
+  /* keep Tab inside the open project */
+  scrim.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab") return;
+    var f = [].filter.call(sheet.querySelectorAll("a[href], button"), function (el) {
+      return el.offsetParent !== null;
+    });
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
 
   document.getElementById("wall").addEventListener("click", function (e) {
     var btn = e.target.closest(".tile");
@@ -496,17 +531,27 @@
   var burger = document.getElementById("burger");
   var navLinks = document.getElementById("navLinks");
 
-  burger.addEventListener("click", function () {
-    var open = navLinks.classList.toggle("open");
-    burger.setAttribute("aria-expanded", open);
+  function setMenu(open) {
+    navLinks.classList.toggle("open", open);
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
     burger.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  }
+
+  burger.addEventListener("click", function () {
+    setMenu(!navLinks.classList.contains("open"));
   });
 
   navLinks.addEventListener("click", function (e) {
-    if (e.target.tagName === "A") {
-      navLinks.classList.remove("open");
-      burger.setAttribute("aria-expanded", "false");
-    }
+    if (e.target.tagName === "A") setMenu(false);
+  });
+
+  /* a tap anywhere else, or Escape, puts it away */
+  document.addEventListener("click", function (e) {
+    if (!navLinks.classList.contains("open")) return;
+    if (!e.target.closest("#nav")) setMenu(false);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && navLinks.classList.contains("open")) { setMenu(false); burger.focus(); }
   });
 
   /* ── scroll-spy ──────────────────────────────────────── */
@@ -841,6 +886,107 @@
     document.documentElement.addEventListener("mouseleave", function () {
       mx = my = -9999;
       if (!raf) raf = requestAnimationFrame(tick);
+    });
+  })();
+
+  /* ── scroll-linked: progress bar and the timelines ─────────
+     One passive listener, one frame. The bar under the nav shows how
+     far down the page you are. Each timeline's spine fills as you
+     scroll past it and every entry arrives as the line reaches it —
+     on a phone the career column is taller than the screen, so a
+     timed animation would have finished before the lower entries
+     were ever seen. */
+  (function scrollLinked() {
+    var bar = document.getElementById("navProgress");
+    var lines = [].slice.call(document.querySelectorAll(".timeline"));
+    var ticking = false;
+
+    if (reduced) {
+      lines.forEach(function (ol) {
+        [].forEach.call(ol.children, function (li) { li.classList.add("in"); });
+      });
+    }
+
+    function update() {
+      ticking = false;
+      var vh = window.innerHeight;
+
+      if (bar) {
+        var max = document.documentElement.scrollHeight - vh;
+        bar.style.transform = "scaleX(" + (max > 0 ? Math.min(1, window.scrollY / max) : 0) + ")";
+      }
+      if (reduced) return;
+
+      var edge = vh * 0.82;                       /* where the line is "drawn to" */
+      lines.forEach(function (ol) {
+        var items = ol.children; if (!items.length) return;
+        var top = items[0].getBoundingClientRect().top + 8;
+        var len = items[items.length - 1].getBoundingClientRect().top - items[0].getBoundingClientRect().top;
+        var drawn = len > 0 ? Math.max(0, Math.min(1, (edge - top) / len)) : (edge > top ? 1 : 0);
+        ol.style.setProperty("--draw", drawn.toFixed(3));
+        [].forEach.call(items, function (li) {
+          if (!li.classList.contains("in") && li.getBoundingClientRect().top < edge) li.classList.add("in");
+        });
+      });
+    }
+
+    window.addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+  })();
+
+  /* ── the hero numbers count up ───────────────────────────── */
+  (function countUp() {
+    if (reduced) return;
+    [].forEach.call(document.querySelectorAll(".stat b"), function (b) {
+      var m = /^(\d+)(.*)$/.exec(b.textContent.trim());
+      if (!m) return;                              /* "MID" stays as it is */
+      var to = +m[1], rest = m[2], t0 = null, DUR = 900;
+      b.textContent = "0" + rest;
+      setTimeout(function () {
+        requestAnimationFrame(function step(t) {
+          if (t0 === null) t0 = t;
+          var k = Math.min(1, (t - t0) / DUR);
+          b.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))) + rest;
+          if (k < 1) requestAnimationFrame(step);
+        });
+      }, 1100);                                    /* after the stats row fades in */
+    });
+  })();
+
+  /* ── touch: the tile in the middle of the screen plays ─────
+     The slideshow on each tile used to need a hover, which a phone
+     doesn't have, so the dots promised pictures nobody could reach.
+     Now whichever tile sits in the middle band of the screen cycles,
+     and stops when it scrolls away. */
+  (function touchSlides() {
+    if (fine || reduced || !("IntersectionObserver" in window)) return;
+    var mid = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var t = en.target;
+        if (scrim.classList.contains("open")) return;
+        if (en.isIntersecting) { if (t._start) t._start(); }
+        else if (t._stop) t._stop();
+      });
+    }, { rootMargin: "-38% 0px -38% 0px" });
+    [].forEach.call(document.querySelectorAll(".tile"), function (t) {
+      if (t._start) mid.observe(t);
+    });
+  })();
+
+  /* ── touch: tap "other side" for the wireframe ─────────────
+     The same sketch-to-finished swap the pointer gets on desktop. */
+  (function tapWireframe() {
+    var em = document.querySelector(".tw em");
+    if (!em || reduced || fine) return;
+    var t = 0;
+    em.addEventListener("click", function () {
+      if (document.querySelector(".tw .c:not(.on)")) return;   /* still typing */
+      clearTimeout(t);
+      em.classList.add("wf");
+      t = setTimeout(function () { em.classList.remove("wf"); }, 700);
     });
   })();
 })();
