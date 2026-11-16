@@ -112,8 +112,39 @@
   })();
 
   /* ── methods ─────────────────────────────────────────── */
+  /* The toolkit row. Each tile asks for its logo and, if the file isn't
+     there yet, the image removes itself and the tile keeps the name — so
+     the row never shows a broken-image box and reads as finished either
+     way. Nothing here draws a mark; the files in assets/tools/ are the
+     makers' own. */
+  (function () {
+    var host = document.getElementById("toolkit");
+    if (!host || typeof TOOLS === "undefined") return;
+    host.innerHTML =
+      '<p class="method-k">Tools</p>' +
+      '<ul class="tool-row">' +
+      TOOLS.map(function (t) {
+        var img = t.icon
+          ? '<img src="' + t.icon + '" alt="" width="22" height="22" ' +
+            'onerror="this.closest(\'.tool\').classList.add(\'tool-bare\');this.remove()">'
+          : "";
+        return '<li class="tool' + (t.icon ? "" : " tool-bare") + '">' +
+                 img + '<span>' + t.name + '</span>' +
+               '</li>';
+      }).join("") +
+      '</ul>';
+  }());
+
   document.getElementById("methods").innerHTML = METHODS.map(function (m) {
-    return '<div class="method"><b>' + m.name + '</b><span>' + m.note + '</span></div>';
+    return (
+      '<div class="method">' +
+        '<p class="method-k">' + m.group + '</p>' +
+        '<p class="method-line">' + m.line + '</p>' +
+        '<p class="method-chips">' +
+          m.items.map(function (t) { return "<i>" + t + "</i>"; }).join("") +
+        '</p>' +
+      '</div>'
+    );
   }).join("");
 
   /* ── the five years before design ─────────────────────── */

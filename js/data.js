@@ -80,22 +80,62 @@ const QUOTES = [
     name: "Harsha", role: "Cap It Hot · UTS", initials: "UTS" }
 ];
 
-/* Grouped to match how job ads name things — recruiters and ATS
-   filters scan for these exact phrases. Everything here is something
-   you have actually done; don't add a row you can't talk about. */
+/* ── skills ─────────────────────────────────────────
+   Three claims, each with its evidence. Twelve equal cards had no
+   hierarchy, so there was nothing to scan — a reader had to read all
+   of it or none. The sentence is the claim; the chips are the
+   keywords a recruiter or an ATS filter is actually looking for.
+
+   Everything here is something you have done. Don't add a chip you
+   can't talk about for two minutes. */
+/* ── the toolkit ───────────────────────────────────
+   Each tool shows its logo when there is a file at `icon`, and its
+   name alone when there isn't — so the row looks deliberate either
+   way and improves as you add marks.
+
+   Download the official SVG from each maker's brand page and drop it
+   into assets/tools/. Don't use a redrawn copy from an icon pack:
+   these are trademarks, and the makers publish the real files for
+   exactly this use. Keep each file under ~10 KB. */
+const TOOLS = [
+  /* grouped: design, then build, then delivery — the row reads left to
+     right the same way the three bands above it do */
+  { name: "Figma",     icon: "assets/tools/figma.svg" },
+  { name: "Miro",      icon: "assets/tools/miro.svg" },
+  { name: "Adobe XD",  icon: "assets/tools/adobe-xd.svg" },
+  { name: "Swift",     icon: "assets/tools/swift.svg" },
+  { name: "SwiftUI",   icon: "assets/tools/swiftui.svg" },
+  { name: "Xcode",     icon: "assets/tools/xcode.svg" },
+  { name: "Unity",     icon: "assets/tools/unity.svg" },
+  { name: "p5.js",     icon: "assets/tools/p5js.svg" },
+  { name: "Python",    icon: "assets/tools/python.svg" },
+  { name: "Ruby",      icon: "assets/tools/ruby.svg" },
+  { name: "Jira",      icon: "assets/tools/jira.svg" },
+  { name: "Trello",    icon: "assets/tools/trello.svg" },
+  { name: "Jenkins",   icon: "assets/tools/jenkins.svg" }
+];
+
 const METHODS = [
-  { name: "Mixed-methods research",   note: "Qualitative depth, quantitative validation" },
-  { name: "Generative research",      note: "Field & contextual interviews, cultural probes" },
-  { name: "Evaluative research",      note: "Moderated usability testing, heuristic evaluation" },
-  { name: "Research synthesis",       note: "Thematic analysis, affinity mapping, personas" },
-  { name: "Interaction design",       note: "User flows, information architecture, journey maps" },
-  { name: "Wireframing & prototyping", note: "Low-fi to high-fi, Figma" },
-  { name: "Design systems",           note: "Tokens, components, developer handoff" },
-  { name: "Accessibility",            note: "WCAG-aligned, inclusive design for 65+" },
-  { name: "AI-assisted workflows",    note: "Generative tooling with documented provenance" },
-  { name: "Cross-functional delivery", note: "Agile teams, product owners, engineers" },
-  { name: "Design-to-code",           note: "SwiftUI, Unity, p5.js - prototypes that run" },
-  { name: "Stakeholder communication", note: "Design rationale for technical & non-technical audiences" }
+  {
+    group: "Research",
+    line: "I start by asking people what's actually hard.",
+    items: ["Mixed methods", "Participant recruitment", "Field interviews",
+            "Cultural probes", "Usability testing", "Heuristic evaluation",
+            "Thematic analysis", "Affinity mapping", "Personas"]
+  },
+  {
+    group: "Design",
+    line: "Then I turn what they told me into something clearer.",
+    items: ["Interaction design", "User flows", "Information architecture",
+            "Journey mapping", "Wireframing", "High-fidelity prototyping",
+            "Design systems", "WCAG accessibility"]
+  },
+  {
+    group: "Build & deliver",
+    line: "I build it myself, so you can click it, not just look at it.",
+    items: ["Design-to-code", "AI-assisted workflows", "Agile delivery",
+            "Developer handoff", "Design rationale"]
+  }
 ];
 
 /* ── PROJECT IMAGES ────────────────────────────────────────

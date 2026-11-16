@@ -521,13 +521,60 @@ a{ color: inherit; }
 .quote .who{ font-size: .8rem; font-weight: 600; color: var(--dark); line-height: 1.35; }
 .quote .who span{ display: block; font-weight: 400; color: var(--forest-mid); font-size: .75rem; }
 
-.methods{ display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; }
-.method{
-  background: var(--white); border: 1px solid var(--hair);
-  border-radius: 14px; padding: .95rem 1rem 1.05rem;
+/* Three bands, not twelve cards. Equal cards gave the eye nothing to
+   land on, so the section had to be read rather than scanned. Now the
+   sentence carries the claim and the chips carry the keywords — a
+   recruiter gets three things to take in, and the ATS phrases are
+   still all there, just in a form nobody has to read. */
+.methods{ display: grid; gap: 0; }
+.method{ padding: 1.5rem 0; border-top: 1px solid rgba(52, 78, 56, .16); }
+.method:first-child{ border-top: 0; padding-top: .25rem; }
+/* The last band only tightens up when it really is the end of the
+   section. Once the toolkit follows it, it keeps its full 1.5rem so the
+   gap above that rule matches every other band-to-band gap. */
+.methods:last-child .method:last-child{ padding-bottom: .25rem; }
+
+.method-k{
+  margin: 0 0 .3rem;
+  font-size: .62rem; font-weight: 700; letter-spacing: .14em;
+  /* forest-mid is only 4.29:1 on sage-pale and this is small uppercase
+     text, which needs more, not less */
+  text-transform: uppercase; color: var(--forest);
 }
-.method b{ display: block; font-size: .87rem; font-weight: 600; color: var(--dark); margin-bottom: .2rem; line-height: 1.25; }
-.method span{ font-size: .74rem; color: var(--forest-mid); line-height: 1.45; }
+.method-line{
+  margin: 0 0 .9rem; max-width: 46ch;
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(1.05rem, 2.1vw, 1.35rem); line-height: 1.3;
+  letter-spacing: -.012em; color: var(--dark);
+}
+.method-chips{ display: flex; flex-wrap: wrap; gap: .4rem; margin: 0; }
+.method-chips i{
+  font-style: normal; padding: .3rem .72rem;
+  background: var(--white); border: 1px solid rgba(52, 78, 56, .12);
+  border-radius: 100px; box-shadow: 0 1px 2px rgba(28, 43, 30, .05);
+  font-size: .76rem; font-weight: 500; color: var(--forest-body);
+}
+
+/* The toolkit sits under the three claim bands as a fourth, but reads
+   differently on purpose: the chips above are things I do, these are
+   things I open. Bigger tiles, logo + name, so the eye catches them
+   without reading. A tile whose logo file is missing drops to
+   .tool-bare and centres its name, which is why the row still looks
+   deliberate before any SVG is in assets/tools/. */
+.toolkit{ padding: 1.5rem 0 .25rem; border-top: 1px solid rgba(52, 78, 56, .16); }
+.tool-row{
+  display: flex; flex-wrap: wrap; gap: .5rem;
+  margin: .55rem 0 0; padding: 0; list-style: none;
+}
+.tool{
+  display: inline-flex; align-items: center; gap: .46rem;
+  padding: .42rem .8rem .42rem .62rem;
+  background: var(--white); border: 1px solid rgba(52, 78, 56, .12);
+  border-radius: 100px; box-shadow: 0 1px 2px rgba(28, 43, 30, .05);
+  font-size: .82rem; font-weight: 500; color: var(--forest-body);
+}
+.tool img{ display: block; width: 22px; height: 22px; object-fit: contain; }
+.tool-bare{ padding: .42rem .8rem; }
 
 /* ─── before design: the five years in test ───────────────
    Same dark band and floating light card as Selected work.
@@ -846,7 +893,9 @@ a{ color: inherit; }
   .wall{ grid-template-columns: repeat(2, 1fr); }
   .quotes{ grid-template-columns: 1fr; }
   .quote.lead{ grid-column: auto; }
-  .methods{ grid-template-columns: repeat(2, 1fr); }
+  .method-chips i{ font-size: .72rem; padding: .28rem .6rem; }
+  .tool{ font-size: .78rem; }
+  .tool img{ width: 20px; height: 20px; }
   .tracks{ grid-template-columns: 1fr; gap: 2.5rem; }
   .eng-points{ grid-template-columns: 1fr; gap: .7rem; }
   .eng-stack-row{ flex-direction: column; align-items: flex-start; }
